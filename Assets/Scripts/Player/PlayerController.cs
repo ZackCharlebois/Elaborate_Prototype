@@ -103,7 +103,14 @@ public class PlayerController : MonoBehaviour
         //(changes involving physics rigidbodies go in FixedUpdate)
         if (_input.actions["Fire"].WasPressedThisFrame())
         {
-            _shooter.Fire(new Vector2(_isFacingRight ? 1 : -1, 0));
+            //Old projectile aiming
+            //_shooter.Fire(new Vector2(_isFacingRight ? 1 : -1, 0));
+            //_healthSystem.SelfDamage(1);
+
+            //New projectile aiming based on mouse position
+            Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+            Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+            _shooter.Fire(((Vector2)mouseWorldPos - (Vector2)transform.position).normalized);
             _healthSystem.SelfDamage(1);
         }
 
