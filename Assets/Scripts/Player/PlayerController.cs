@@ -43,11 +43,12 @@ public class PlayerController : MonoBehaviour
     private float _horizontalInput = 0f;
     private bool _isJumpDown = false;
     private bool _isJumpHeldDown = false;
+    private bool _canDoubleJump = true;
 
     #endregion
 
     #region state private fields
-    
+
     private bool _isFacingRight = true;
     private bool _isInKickBack = false;
     private bool _isFainting = false;
@@ -167,20 +168,29 @@ public class PlayerController : MonoBehaviour
         {
             _coyoteTimeLeft = 0f;
             _hasLeftGround = false;
+            _canDoubleJump = true; 
         }
         
         //Jump
-        if (_isJumpDown || _earlyJumpTimeLeft > 0f)
+        if (_isJumpDown|| _earlyJumpTimeLeft > 0f)
         {
             _isJumpDown = false; //we have now used up this button press
             
             //either being on the ground or still in coyote time we can jump
-            if (IsOnGround() || _coyoteTimeLeft > 0f)
+            if (IsOnGround() || _canDoubleJump || _coyoteTimeLeft > 0f)
             {
                 _rb.velocity = new Vector2(_rb.velocity.x, jumpForce);
                 _coyoteTimeLeft = 0f; //jumping cancels coyote time (or you will get air jumps)
                 _earlyJumpTimeLeft = 0f; //can't reuse the early jump press.
-                _hasLeftGround = true;
+                if (_hasLeftGround)
+                {
+                    _canDoubleJump = false;
+                }
+                else
+                {
+                    _hasLeftGround = true;
+                }
+                
                 AudioSystem.Instance.PlaySound(_soundJump, transform.position);
             }
         }
